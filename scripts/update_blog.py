@@ -1,45 +1,75 @@
+import re
+from pathlib import Path
+
 import feedparser
 import git
-import os
 
-# 벨로그 RSS 피드 URL
-# example : rss_url = 'https://api.velog.io/rss/@rimgosu'
-rss_url = 'https://api.velog.io/rss/@klmcw1004'
 
-# 깃허브 레포지토리 경로
-repo_path = '.'
+# 자신의 벨로그 아이디 확인
+RSS_URL = "https://api.velog.io/rss/@klmcw1004"
 
-# 'velog-posts' 폴더 경로
-posts_dir = os.path.join(repo_path, 'velog-posts')
+REPOSITORY_PATH = "."
+POSTS_DIRECTORY = Path(REPOSITORY_PATH) / "velog-posts"
 
-# 'velog-posts' 폴더가 없다면 생성
-if not os.path.exists(posts_dir):
-    os.makedirs(posts_dir)
 
-# 레포지토리 로드
-repo = git.Repo(repo_path)
+def sanitize_filename(title: str) -> str:
+    """파일명으로 사용할 수 없는 문자를 제거한다."""
+    filename = re.sub(r'[\\/:*?"<>|]', "-", title)
+    filename = filename.strip().rstrip(".")
 
-# RSS 피드 파싱
-feed = feedparser.parse(rss_url)
+    if not filename:
+        filename = "untitled"
 
-# 각 글을 파일로 저장하고 커밋
-for entry in feed.entries:
-    # 파일 이름에서 유효하지 않은 문자 제거 또는 대체
-    file_name = entry.title
-    file_name = file_name.replace('/', '-')  # 슬래시를 대시로 대체
-    file_name = file_name.replace('\\', '-')  # 백슬래시를 대시로 대체
-    # 필요에 따라 추가 문자 대체
-    file_name += '.md'
-    file_path = os.path.join(posts_dir, file_name)
+    return f"{filename}.md"
 
-    # 파일이 이미 존재하지 않으면 생성
-    if not os.path.exists(file_path):
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(entry.description)  # 글 내용을 파일에 작성
 
-        # 깃허브 커밋
-        repo.git.add(file_path)
-        repo.git.commit('-m', f'Add post: {entry.title}')
+def main() -> None:
+    POSTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
-# 변경 사항을 깃허브에 푸시
-repo.git.push()
+    feed = feedparser.parse(RSS_URL)
+
+    if not feed.entries:
+        raise RuntimeError(
+            f"벨로그 RSS에서 글을 가져오지 못했습니다: {RSS_URL}"
+        )
+
+    updated_count = 0
+
+    for entry in feed.entries:
+        title = entry.get("title", "제목 없음")
+        content = entry.get("description", "")
+
+        filename = sanitize_filename(title)
+        file_path = POSTS_DIRECTORY / filename
+
+        previous_content = None
+
+        if file_path.exists():
+            previous_content = file_path.read_text(encoding="utf-8")
+
+        # 새 글이거나 기존 글 내용이 변경됐을 때 저장
+        if previous_content != content:
+            file_path.write_text(content, encoding="utf-8")
+            updated_count += 1
+            print(f"업데이트: {filename}")
+
+    repository = git.Repo(REPOSITORY_PATH)
+
+    repository.git.add(str(POSTS_DIRECTORY))
+
+    if repository.is_dirty(
+        index=True,
+        working_tree=True,
+        untracked_files=True,
+    ):
+        repository.index.commit(
+            f"docs: sync {updated_count} Velog post(s)"
+        )
+        repository.remote(name="origin").push()
+        print(f"{updated_count}개의 글을 커밋했습니다.")
+    else:
+        print("변경된 벨로그 글이 없습니다.")
+
+
+if __name__ == "__main__":
+    main()
