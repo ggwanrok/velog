@@ -15,7 +15,7 @@ JOIN</code></pre>
 <li>데이터베이스는 잘못된 데이터를 어떻게 막는가?</li>
 <li>NULL은 단순히 값이 비어 있다는 뜻인가?</li>
 </ul>
-<p>이번 글에서는 학과, 학생, 과목, 수강신청으로 이루어진 학사관리 구조를 예시로 사용하되, 실습 과정이 아니라 <strong>관계형 데이터베이스의 핵심 원리</strong>를 중심으로 정리한다.</p>
+<p>이번 글에서는 학과, 학생, 과목, 수강신청으로 이루어진 학사관리 구조를 예시로  <strong>관계형 데이터베이스의 핵심 원리</strong>를 중심으로 정리한다.</p>
 <hr />
 <h1 id="dbms와-rdbms">DBMS와 RDBMS</h1>
 <h2 id="dbms">DBMS</h2>
@@ -199,14 +199,14 @@ enrolled_at</code></pre>
 <li>N:M</li>
 </ul>
 <hr />
-<h1 id="11-1n-nm-관계">1:1, 1:N, N:M 관계</h1>
-<h2 id="11-관계">1:1 관계</h2>
+<h2 id="11-1n-nm-관계">1:1, 1:N, N:M 관계</h2>
+<h3 id="11-관계">1:1 관계</h3>
 <p>한쪽의 하나가 다른 쪽의 하나와만 연결되는 관계다.</p>
 <p>예를 들면:</p>
 <pre><code class="language-text">사용자 1 : 1 사용자 상세정보</code></pre>
 <p>반드시 테이블을 분리해야 하는 것은 아니며, 보안이나 선택적 속성 분리 등의 이유가 있을 때 사용한다.</p>
 <hr />
-<h2 id="1n-관계">1:N 관계</h2>
+<h3 id="1n-관계">1:N 관계</h3>
 <p>한쪽의 하나가 다른 쪽의 여러 개와 연결되는 관계다.</p>
 <p>학과와 학생 관계가 대표적이다.</p>
 <pre><code class="language-text">학과 1 : N 학생</code></pre>
@@ -220,7 +220,7 @@ enrolled_at</code></pre>
 <p>왜 학생 테이블에 학과 ID를 둘까?</p>
 <p>학생 한 명은 한 개의 <code>major_id</code>를 가지지만, 하나의 학과 ID는 여러 학생 행에서 반복될 수 있기 때문이다.</p>
 <hr />
-<h2 id="nm-관계">N:M 관계</h2>
+<h3 id="nm-관계">N:M 관계</h3>
 <p>양쪽 모두 여러 개와 연결되는 관계다.</p>
 <p>학생과 과목의 관계가 대표적이다.</p>
 <pre><code class="language-text">학생 N : M 과목</code></pre>
@@ -249,7 +249,7 @@ enrollments
 courses</code></pre>
 <p>제공된 학사관리 예제 역시 학생과 과목 사이의 N:M 관계를 <code>enrollments</code>가 연결하는 구조로 설계되어 있다. </p>
 <hr />
-<h1 id="교차-테이블">교차 테이블</h1>
+<h4 id="교차-테이블">교차 테이블</h4>
 <p>교차 테이블은 N:M 관계를 표현하기 위한 중간 테이블이다.</p>
 <p>학사관리 예제에서는 <code>enrollments</code>가 교차 테이블이다.</p>
 <pre><code class="language-text">enrollments
@@ -329,7 +329,7 @@ students.student_no  업무키, 실제 학번
 courses.id           대리키
 courses.course_code  업무키</code></pre>
 <hr />
-<h1 id="복합-기본키">복합 기본키</h1>
+<h2 id="복합-기본키">복합 기본키</h2>
 <p>하나가 아니라 여러 컬럼을 조합하여 기본키를 구성할 수도 있다.</p>
 <pre><code class="language-sql">PRIMARY KEY (student_id, course_id)</code></pre>
 <p><code>enrollments</code>에서는 <code>student_id</code>만으로는 행을 식별할 수 없다.</p>
@@ -353,7 +353,7 @@ student_id = 4, course_id = 3</code></pre>
 <pre><code class="language-text">enrollment_id</code></pre>
 <p>즉, 키 구조는 업무 규칙에 따라 달라진다.</p>
 <hr />
-<h1 id="외래키와-참조-무결성">외래키와 참조 무결성</h1>
+<h2 id="외래키와-참조-무결성">외래키와 참조 무결성</h2>
 <p>외래키는 다른 테이블의 기본키 또는 UNIQUE 키를 참조하는 컬럼이다.</p>
 <pre><code class="language-sql">FOREIGN KEY (major_id)
 REFERENCES majors(id)</code></pre>
@@ -376,24 +376,24 @@ major_id = NULL</code></pre>
 <p>존재하지 않는 대상을 참조하지 못하도록 데이터베이스가 관계의 유효성을 보장하는 규칙이다.</p>
 </blockquote>
 <hr />
-<h1 id="무결성의-종류">무결성의 종류</h1>
+<h2 id="무결성의-종류">무결성의 종류</h2>
 <p>관계형 데이터베이스에서 무결성은 데이터가 정확하고 일관된 상태를 유지하는 것을 의미한다.</p>
-<h2 id="개체-무결성">개체 무결성</h2>
+<h3 id="개체-무결성">개체 무결성</h3>
 <p>각 행은 유일하게 식별되어야 한다.</p>
 <pre><code class="language-sql">PRIMARY KEY</code></pre>
 <p>기본키는 NULL이 될 수 없고 중복될 수 없다.</p>
 <hr />
-<h2 id="참조-무결성">참조 무결성</h2>
+<h3 id="참조-무결성">참조 무결성</h3>
 <p>외래키는 실제 존재하는 부모 행을 참조해야 한다.</p>
 <pre><code class="language-sql">FOREIGN KEY</code></pre>
 <p>존재하지 않는 학과, 학생, 과목을 참조하는 데이터를 방지한다.</p>
 <hr />
-<h2 id="도메인-무결성">도메인 무결성</h2>
+<h3 id="도메인-무결성">도메인 무결성</h3>
 <p>각 컬럼에는 정의된 형식과 범위의 값만 들어가야 한다.</p>
 <pre><code class="language-sql">CHECK (grade BETWEEN 1 AND 4)
 CHECK (score BETWEEN 0 AND 100)</code></pre>
 <hr />
-<h2 id="사용자-정의-무결성">사용자 정의 무결성</h2>
+<h3 id="사용자-정의-무결성">사용자 정의 무결성</h3>
 <p>특정 업무에서만 필요한 규칙이다.</p>
 <p>예를 들어:</p>
 <pre><code class="language-text">졸업생은 수강신청을 할 수 없다.
@@ -403,7 +403,6 @@ CHECK (score BETWEEN 0 AND 100)</code></pre>
 <hr />
 <h1 id="제약조건">제약조건</h1>
 <p>제약조건은 잘못된 데이터가 저장되는 것을 입력 시점에 막는다.</p>
-<p>실습자료에서도 <code>PRIMARY KEY</code>, <code>UNIQUE</code>, <code>FOREIGN KEY</code>, <code>CHECK</code>를 함께 사용하여 데이터 품질을 유지하는 구조를 제시한다. </p>
 <h2 id="primary-key">PRIMARY KEY</h2>
 <p>행을 유일하게 식별한다.</p>
 <pre><code class="language-sql">id bigint PRIMARY KEY</code></pre>
@@ -450,7 +449,7 @@ NULL  값 자체가 존재하지 않음</code></pre>
 <p>은 아직 성적이 입력되지 않았거나 미응시 상태일 수 있다.</p>
 <p>제공된 예제도 <code>score</code>의 NULL과 실제 0점은 서로 다른 의미임을 구분한다. </p>
 <hr />
-<h1 id="null과-3값-논리">NULL과 3값 논리</h1>
+<h3 id="null과-3값-논리">NULL과 3값 논리</h3>
 <p>일반적인 조건식은 참과 거짓 두 가지로 생각하기 쉽다.</p>
 <p>하지만 SQL은 NULL 때문에 다음 세 가지 논리를 사용한다.</p>
 <pre><code class="language-text">TRUE
@@ -465,18 +464,18 @@ UNKNOWN</code></pre>
 <pre><code class="language-sql">score = NULL</code></pre>
 <p>NULL은 일반 값처럼 <code>=</code>로 비교할 수 없다.</p>
 <hr />
-<h1 id="삭제-정책">삭제 정책</h1>
+<h2 id="삭제-정책">삭제 정책</h2>
 <p>부모 데이터가 삭제될 때 외래키를 가진 자식 데이터를 어떻게 처리할지 결정할 수 있다.</p>
-<h2 id="restrict-또는-no-action">RESTRICT 또는 NO ACTION</h2>
+<h3 id="restrict-또는-no-action">RESTRICT 또는 NO ACTION</h3>
 <p>참조 중인 자식 데이터가 있으면 부모 삭제를 막는다.</p>
 <pre><code class="language-text">학생이 소속된 학과는 삭제 불가</code></pre>
 <hr />
-<h2 id="cascade">CASCADE</h2>
+<h3 id="cascade">CASCADE</h3>
 <p>부모가 삭제되면 관련 자식 데이터도 함께 삭제한다.</p>
 <pre><code class="language-text">학생 삭제
 → 해당 학생의 수강신청도 삭제</code></pre>
 <hr />
-<h2 id="set-null">SET NULL</h2>
+<h3 id="set-null">SET NULL</h3>
 <p>부모가 삭제되면 외래키 값을 NULL로 변경한다.</p>
 <pre><code class="language-text">학과 삭제
 → 학생은 유지
@@ -511,11 +510,11 @@ JOIN majors
 <p>JOIN은 단순한 SQL 기능이 아니라, <strong>정규화된 관계형 구조를 다시 의미 있는 정보로 조립하는 연산</strong>이다.</p>
 <hr />
 <h1 id="join">JOIN</h1>
-<h1 id="join-결과-범위에-따른-종류">JOIN 결과 범위에 따른 종류</h1>
+<h2 id="join-결과-범위에-따른-종류">JOIN 결과 범위에 따른 종류</h2>
 <p>JOIN은 <strong>둘 이상의 테이블을 공통된 컬럼이나 조건을 기준으로 연결해 하나의 조회 결과로 만드는 연산</strong>이다.</p>
 <p>JOIN의 종류는 어떤 행을 결과에 남길 것인지에 따라 구분할 수 있다.</p>
 <hr />
-<h2 id="inner-join">INNER JOIN</h2>
+<h3 id="inner-join">INNER JOIN</h3>
 <p>두 테이블에서 <strong>JOIN 조건을 만족하는 행만 조회</strong>한다.</p>
 <pre><code class="language-sql">SELECT *
 FROM students
@@ -534,14 +533,14 @@ INNER JOIN majors
 <pre><code class="language-sql">JOIN majors</code></pre>
 <p>는 다음과 같은 의미다.</p>
 <pre><code class="language-sql">INNER JOIN majors</code></pre>
-<h3 id="특징">특징</h3>
+<h4 id="특징">특징</h4>
 <ul>
 <li>양쪽 테이블에 일치하는 데이터가 있어야 한다.</li>
 <li>일치하지 않는 행은 결과에서 제외된다.</li>
 <li>실제 업무에서 가장 자주 사용하는 JOIN이다.</li>
 </ul>
 <hr />
-<h2 id="left-outer-join">LEFT OUTER JOIN</h2>
+<h3 id="left-outer-join">LEFT OUTER JOIN</h3>
 <p>왼쪽 테이블의 행은 <strong>모두 유지</strong>하고, 오른쪽 테이블에서는 조건이 일치하는 데이터만 연결한다.</p>
 <pre><code class="language-sql">SELECT *
 FROM students
@@ -552,7 +551,7 @@ LEFT JOIN majors
 이영희 | 인공지능학과
 서지훈 | NULL</code></pre>
 <p>서지훈은 연결되는 학과가 없지만, 왼쪽 테이블인 <code>students</code>의 행은 유지된다. 오른쪽 테이블인 <code>majors</code>의 컬럼만 NULL로 표시된다.</p>
-<h3 id="특징-1">특징</h3>
+<h4 id="특징-1">특징</h4>
 <ul>
 <li>왼쪽 테이블의 모든 행을 조회한다.</li>
 <li>오른쪽에 일치하는 행이 없으면 오른쪽 컬럼은 NULL이 된다.</li>
@@ -563,7 +562,7 @@ LEFT JOIN majors
 <p>과 다음은 같은 의미다.</p>
 <pre><code class="language-sql">LEFT OUTER JOIN</code></pre>
 <hr />
-<h2 id="right-outer-join">RIGHT OUTER JOIN</h2>
+<h3 id="right-outer-join">RIGHT OUTER JOIN</h3>
 <p>오른쪽 테이블의 행은 <strong>모두 유지</strong>하고, 왼쪽 테이블에서는 조건이 일치하는 데이터만 연결한다.</p>
 <pre><code class="language-sql">SELECT *
 FROM students
@@ -573,7 +572,7 @@ RIGHT JOIN majors
 <pre><code class="language-text">김철수 | 컴퓨터공학과
 이영희 | 인공지능학과
 NULL   | 경영학과</code></pre>
-<h3 id="특징-2">특징</h3>
+<h4 id="특징-2">특징</h4>
 <ul>
 <li>오른쪽 테이블의 모든 행을 유지한다.</li>
 <li>왼쪽에 일치하는 데이터가 없으면 왼쪽 컬럼이 NULL이 된다.</li>
@@ -585,7 +584,7 @@ LEFT JOIN students
     ON students.major_id = majors.id;</code></pre>
 <p>이 방식이 쿼리를 왼쪽에서 오른쪽으로 읽기 쉬운 경우가 많다.</p>
 <hr />
-<h2 id="full-outer-join">FULL OUTER JOIN</h2>
+<h3 id="full-outer-join">FULL OUTER JOIN</h3>
 <p>왼쪽과 오른쪽 테이블의 행을 <strong>모두 유지</strong>한다.</p>
 <pre><code class="language-sql">SELECT *
 FROM students
@@ -602,14 +601,14 @@ NULL   | 경영학과</code></pre>
 <li>경영학과는 소속 학생이 없는 학과다.</li>
 </ul>
 <p>둘 다 결과에서 유지된다.</p>
-<h3 id="특징-3">특징</h3>
+<h4 id="특징-3">특징</h4>
 <ul>
 <li>양쪽 테이블의 모든 행을 조회한다.</li>
 <li>한쪽에만 존재하는 데이터도 확인할 수 있다.</li>
 <li>두 데이터 집합의 차이나 누락 데이터를 비교할 때 유용하다.</li>
 </ul>
 <hr />
-<h3 id="outer-join이란">OUTER JOIN이란?</h3>
+<h4 id="outer-join이란">OUTER JOIN이란?</h4>
 <p>다음 세 JOIN을 묶어 OUTER JOIN이라고 한다.</p>
 <pre><code class="language-text">LEFT OUTER JOIN
 RIGHT OUTER JOIN
@@ -622,7 +621,7 @@ FULL OUTER JOIN</code></pre>
 OUTER JOIN
 → 일치하지 않는 행도 특정 방향에 따라 유지</code></pre>
 <hr />
-<h2 id="cross-join">CROSS JOIN</h2>
+<h3 id="cross-join">CROSS JOIN</h3>
 <p>두 테이블의 모든 행을 가능한 모든 조합으로 연결한다.</p>
 <pre><code class="language-sql">SELECT *
 FROM students
@@ -637,7 +636,7 @@ CROSS JOIN courses;</code></pre>
 이영희 | Java 프로그래밍
 이영희 | Python 프로그래밍
 ...</code></pre>
-<h3 id="특징-4">특징</h3>
+<h4 id="특징-4">특징</h4>
 <ul>
 <li>JOIN 조건을 사용하지 않는다.</li>
 <li>두 테이블의 데카르트 곱을 만든다.</li>
@@ -653,8 +652,8 @@ CROSS JOIN courses;</code></pre>
 <p>의도하지 않게 JOIN 조건을 빠뜨리면 CROSS JOIN과 비슷하게 행 수가 폭증할 수 있으므로 주의해야 한다.</p>
 <hr />
 <h2 id="join-조건을-작성하는-방법">JOIN 조건을 작성하는 방법</h2>
-<h2 id="using과-비교">USING과 비교</h2>
-<h3 id="on">ON</h3>
+<h3 id="using과-비교">USING과 비교</h3>
+<h4 id="on">ON</h4>
 <pre><code class="language-sql">JOIN majors
     ON students.major_id = majors.major_id</code></pre>
 <ul>
@@ -662,14 +661,14 @@ CROSS JOIN courses;</code></pre>
 <li>서로 다른 이름의 컬럼도 연결할 수 있다.</li>
 <li>실무에서 가장 일반적이다.</li>
 </ul>
-<h3 id="using">USING</h3>
+<h4 id="using">USING</h4>
 <pre><code class="language-sql">JOIN majors
     USING (major_id)</code></pre>
 <ul>
 <li>같은 이름의 특정 컬럼을 명시적으로 사용한다.</li>
 <li>공통 컬럼은 결과에 한 번만 출력된다.</li>
 </ul>
-<h3 id="natural-join">NATURAL JOIN</h3>
+<h4 id="natural-join">NATURAL JOIN</h4>
 <pre><code class="language-sql">NATURAL JOIN majors</code></pre>
 <ul>
 <li>같은 이름의 모든 컬럼을 자동으로 사용한다.</li>
@@ -677,8 +676,8 @@ CROSS JOIN courses;</code></pre>
 <li>테이블 변경에 따라 동작이 달라질 위험이 있다.</li>
 </ul>
 <hr />
-<h2 id="특수한-join-활용">특수한 JOIN 활용</h2>
-<h3 id="self-join">SELF JOIN</h3>
+<h3 id="특수한-join-활용">특수한 JOIN 활용</h3>
+<h4 id="self-join">SELF JOIN</h4>
 <p>하나의 테이블을 <strong>자기 자신과 JOIN</strong>하는 방식이다.</p>
 <p>SELF JOIN은 별도의 SQL 키워드가 아니라, 같은 테이블에 서로 다른 별칭을 붙여 JOIN하는 패턴이다.</p>
 <p>예를 들어 직원 테이블에 직원과 상사의 관계가 있다고 하자.</p>
@@ -699,23 +698,23 @@ LEFT JOIN employees manager
 
 manager
 → 상사 역할</code></pre>
-<h3 id="특징-5">특징</h3>
+<h4 id="특징-5">특징</h4>
 <ul>
 <li>계층 구조를 표현할 때 사용한다.</li>
 <li>직원과 상사, 카테고리와 상위 카테고리, 댓글과 부모 댓글 등에 활용한다.</li>
 <li>같은 테이블을 구분하기 위해 별칭이 중요하다.</li>
 </ul>
 <hr />
-<h1 id="조건에-따른-join-분류">조건에 따른 JOIN 분류</h1>
+<h2 id="조건에-따른-join-분류">조건에 따른 JOIN 분류</h2>
 <p>JOIN은 결과를 유지하는 방식뿐 아니라 <strong>어떤 조건으로 행을 연결하는지</strong>에 따라서도 나눌 수 있다.</p>
 <hr />
-<h2 id="equi-join">EQUI JOIN</h2>
+<h3 id="equi-join">EQUI JOIN</h3>
 <p>두 컬럼의 값이 같은지를 기준으로 연결한다.</p>
 <pre><code class="language-sql">ON students.major_id = majors.id</code></pre>
 <p><code>=</code> 연산자를 사용하는 일반적인 JOIN이다.</p>
 <p>대부분의 기본키와 외래키 JOIN이 EQUI JOIN에 해당한다.</p>
 <hr />
-<h2 id="non-equi-join">NON-EQUI JOIN</h2>
+<h3 id="non-equi-join">NON-EQUI JOIN</h3>
 <p>같음이 아니라 범위나 부등호 조건으로 연결한다.</p>
 <pre><code class="language-sql">SELECT
     employees.name,
@@ -726,7 +725,7 @@ JOIN salary_grade
        BETWEEN salary_grade.min_salary
            AND salary_grade.max_salary;</code></pre>
 <p>직원의 급여가 어느 등급 구간에 포함되는지 조회하는 경우다.</p>
-<h3 id="특징-6">특징</h3>
+<h4 id="특징-6">특징</h4>
 <ul>
 <li><code>=</code>이 아닌 비교 조건을 사용한다.</li>
 <li><code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code> 등을 사용할 수 있다.</li>

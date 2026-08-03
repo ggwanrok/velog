@@ -18,7 +18,7 @@
 </ol>
 <p>예시는 PostgreSQL의 <code>employees</code>, <code>departments</code> 테이블을 기준으로 작성한다.</p>
 <hr />
-<h1 id="1-sql의-집계-함수">1. SQL의 집계 함수</h1>
+<h1 id="sql의-집계-함수">SQL의 집계 함수</h1>
 <p>집계 함수는 여러 행의 데이터를 하나의 결과값으로 요약할 때 사용한다.</p>
 <p>예를 들어 직원 테이블에 여러 직원의 급여가 저장되어 있을 때 다음과 같은 정보를 구할 수 있다.</p>
 <ul>
@@ -71,7 +71,7 @@ FROM employees;</code></pre>
     ↓
 전체 직원 수, 급여 합계, 평균 급여</code></pre>
 <hr />
-<h2 id="count와-countcolumn의-차이">COUNT(*)와 COUNT(column)의 차이</h2>
+<h3 id="count와-countcolumn의-차이">COUNT(*)와 COUNT(column)의 차이</h3>
 <p><code>COUNT(*)</code>는 조건을 만족하는 모든 행의 개수를 센다.</p>
 <pre><code class="language-sql">SELECT COUNT(*)
 FROM employees;</code></pre>
@@ -102,7 +102,7 @@ GROUP BY department_id;</code></pre>
       ↓ 집계
 부서별 직원 수와 평균 급여</code></pre>
 <hr />
-<h2 id="group-by를-사용할-때의-select-규칙">GROUP BY를 사용할 때의 SELECT 규칙</h2>
+<h3 id="group-by를-사용할-때의-select-규칙">GROUP BY를 사용할 때의 SELECT 규칙</h3>
 <p><code>GROUP BY</code>를 사용하는 쿼리의 <code>SELECT</code> 절에는 일반적으로 다음 두 종류의 표현만 사용할 수 있다.</p>
 <ol>
 <li><code>GROUP BY</code>에 포함된 컬럼</li>
@@ -147,7 +147,7 @@ GROUP BY department_id
 HAVING COUNT(*) &gt;= 5;</code></pre>
 <p>직원이 5명 이상인 부서만 결과에 포함된다.</p>
 <hr />
-<h2 id="where와-having-함께-사용하기">WHERE와 HAVING 함께 사용하기</h2>
+<h3 id="where와-having-함께-사용하기">WHERE와 HAVING 함께 사용하기</h3>
 <pre><code class="language-sql">SELECT
     department_id,
     COUNT(*) AS employee_count,
@@ -244,7 +244,7 @@ GROUP BY CUBE(
 CUBE
 → 여러 차원의 모든 소계가 필요할 때</code></pre>
 <hr />
-<h1 id="2-join-알고리즘">2. JOIN 알고리즘</h1>
+<h1 id="join-알고리즘">JOIN 알고리즘</h1>
 <p>SQL에서 <code>INNER JOIN</code>, <code>LEFT JOIN</code>은 어떤 데이터를 결과에 포함할지를 결정한다.</p>
 <pre><code class="language-sql">SELECT
     e.employee_id,
@@ -267,8 +267,11 @@ JOIN departments d
 NLJ, HJ, SMJ
 → 두 테이블을 내부적으로 어떻게 비교할 것인가</code></pre>
 <p>동일한 <code>INNER JOIN</code> SQL도 데이터 크기, 인덱스, 통계 정보 등에 따라 서로 다른 알고리즘으로 실행될 수 있다.</p>
+<blockquote>
+<p>DBMS 가 신경쓸 일이다~</p>
+</blockquote>
 <hr />
-<h2 id="21-nested-loop-join">2.1 Nested Loop Join</h2>
+<h2 id="nested-loop-join">Nested Loop Join</h2>
 <p>NLJ는 Nested Loop Join의 약자다.</p>
 <p>한쪽 테이블의 각 행을 기준으로 다른 테이블에서 조건에 맞는 행을 찾는다.</p>
 <p>개념적으로는 중첩 반복문과 비슷하다.</p>
@@ -285,7 +288,7 @@ NLJ, HJ, SMJ
 30번 부서 선택
 → employees에서 30번 부서 직원 검색</code></pre>
 <hr />
-<h2 id="nlj의-장점">NLJ의 장점</h2>
+<h3 id="nlj의-장점">NLJ의 장점</h3>
 <p>NLJ는 다음과 같은 상황에서 유리하다.</p>
 <ul>
 <li>한쪽 테이블의 조회 결과가 적을 때</li>
@@ -299,7 +302,7 @@ ON employees(department_id);</code></pre>
 <p>부서 한 행을 읽을 때마다 전체 직원 테이블을 처음부터 찾는 것이 아니라 인덱스를 이용해 해당 부서의 직원만 찾을 수 있다.</p>
 <p>이를 Index Nested Loop Join이라고 볼 수 있다.</p>
 <hr />
-<h2 id="nlj의-단점">NLJ의 단점</h2>
+<h3 id="nlj의-단점">NLJ의 단점</h3>
 <p>외부 테이블의 행이 많고 내부 테이블에서 인덱스를 사용할 수 없다면 반복적인 탐색 비용이 커진다.</p>
 <pre><code class="language-text">외부 테이블 10,000행
 ×
@@ -307,7 +310,7 @@ ON employees(department_id);</code></pre>
 <p>최악의 경우 매우 많은 비교가 발생할 수 있다.</p>
 <p>따라서 NLJ는 일반적으로 <strong>작은 외부 결과와 효율적인 내부 탐색 수단이 있을 때</strong> 강점을 가진다.</p>
 <hr />
-<h2 id="22-hash-join">2.2 Hash Join</h2>
+<h2 id="hash-join">Hash Join</h2>
 <p>HJ는 Hash Join의 약자다.</p>
 <p>한쪽 테이블의 JOIN 키를 이용해 해시 테이블을 만들고, 다른 테이블의 값을 해시 테이블에서 탐색한다.</p>
 <p>Hash Join은 크게 두 단계로 진행된다.</p>
@@ -326,7 +329,7 @@ ON employees(department_id);</code></pre>
 → Hash Table에서 20 검색
 → Marketing과 결합</code></pre>
 <hr />
-<h2 id="hash-join의-장점">Hash Join의 장점</h2>
+<h3 id="hash-join의-장점">Hash Join의 장점</h3>
 <p>Hash Join은 다음과 같은 상황에 적합하다.</p>
 <ul>
 <li>두 테이블의 데이터가 비교적 많을 때</li>
@@ -337,7 +340,7 @@ ON employees(department_id);</code></pre>
 <pre><code class="language-sql">ON e.department_id = d.department_id</code></pre>
 <p>Hash Join은 이와 같은 동등 비교에 강하다.</p>
 <hr />
-<h2 id="hash-join의-단점">Hash Join의 단점</h2>
+<h3 id="hash-join의-단점">Hash Join의 단점</h3>
 <p>Hash Join은 해시 테이블을 메모리에 생성해야 한다.</p>
 <p>해시 테이블이 메모리보다 커지면 디스크를 활용하면서 추가 비용이 발생할 수 있다.</p>
 <p>또한 기본적으로 해시값을 기준으로 찾기 때문에 다음과 같은 범위 조건에는 적합하지 않다.</p>
@@ -348,7 +351,7 @@ ON employees(department_id);</code></pre>
 범위 조건
 → 다른 JOIN 방식이 더 적합할 수 있음</code></pre>
 <hr />
-<h2 id="23-sort-merge-join">2.3 Sort Merge Join</h2>
+<h2 id="sort-merge-join">Sort Merge Join</h2>
 <p>SMJ는 Sort Merge Join의 약자다.</p>
 <p>두 입력을 JOIN 키 기준으로 정렬한 뒤, 정렬된 결과를 앞에서부터 비교하며 결합한다.</p>
 <p>예를 들어 두 테이블의 JOIN 키가 다음과 같다고 하자.</p>
@@ -361,7 +364,7 @@ departments: 10 20 30 50</code></pre>
 40과 50 비교 → 40 쪽 이동</code></pre>
 <p>이미 지나간 값을 다시 처음부터 검색할 필요가 없다.</p>
 <hr />
-<h2 id="smj의-장점">SMJ의 장점</h2>
+<h3 id="smj의-장점">SMJ의 장점</h3>
 <p>SMJ는 다음과 같은 상황에서 유리하다.</p>
 <ul>
 <li>두 입력이 이미 JOIN 키 기준으로 정렬되어 있을 때</li>
@@ -370,7 +373,7 @@ departments: 10 20 30 50</code></pre>
 <li>정렬 결과를 다른 연산에서도 활용할 수 있을 때</li>
 </ul>
 <hr />
-<h2 id="smj의-단점">SMJ의 단점</h2>
+<h3 id="smj의-단점">SMJ의 단점</h3>
 <p>입력 데이터가 정렬되어 있지 않다면 먼저 정렬 작업을 수행해야 한다.</p>
 <pre><code class="language-text">테이블 A 정렬
 +
@@ -447,7 +450,7 @@ JOIN 조건
 컬럼 값의 분포
 DBMS가 보유한 통계 정보</code></pre>
 <hr />
-<h1 id="3-서브쿼리와-집합-연산자">3. 서브쿼리와 집합 연산자</h1>
+<h1 id="서브쿼리와-집합-연산자">서브쿼리와 집합 연산자</h1>
 <p>서브쿼리와 집합 연산자는 모두 여러 <code>SELECT</code> 문을 함께 사용한다.</p>
 <p>하지만 목적은 다르다.</p>
 <pre><code class="language-text">서브쿼리
@@ -456,7 +459,7 @@ DBMS가 보유한 통계 정보</code></pre>
 집합 연산자
 → 여러 SELECT 결과를 하나의 결과 집합으로 결합</code></pre>
 <hr />
-<h2 id="31-서브쿼리">3.1 서브쿼리</h2>
+<h2 id="서브쿼리">서브쿼리</h2>
 <p>서브쿼리는 SQL 문 안에 포함된 또 다른 SQL 문이다.</p>
 <pre><code class="language-sql">SELECT
     employee_id,
@@ -576,7 +579,7 @@ WHERE department_id NOT IN (
 <p>SQL에서 <code>NULL</code>은 값이 없다는 의미이지 일반적인 값처럼 비교할 수 있는 대상이 아니기 때문이다.</p>
 <p>존재하지 않는 데이터를 찾는 경우에는 <code>NOT EXISTS</code>가 의도를 더 명확하게 표현하는 경우가 많다.</p>
 <hr />
-<h2 id="32-집합-연산자">3.2 집합 연산자</h2>
+<h2 id="집합-연산자">집합 연산자</h2>
 <p>집합 연산자는 여러 <code>SELECT</code> 문의 결과를 행 단위로 결합한다.</p>
 <p>대표적인 집합 연산자는 다음과 같다.</p>
 <table>
@@ -685,7 +688,7 @@ UNION ALL
 SELECT employee_id, first_name
 FROM retired_employees;</code></pre>
 <hr />
-<h1 id="4-cte와-view">4. CTE와 VIEW</h1>
+<h1 id="cte와-view">CTE와 VIEW</h1>
 <p>CTE와 VIEW는 모두 쿼리 결과에 이름을 붙여 테이블처럼 사용할 수 있게 한다.</p>
 <p>하지만 사용 범위와 목적이 다르다.</p>
 <pre><code class="language-text">CTE
@@ -694,7 +697,7 @@ FROM retired_employees;</code></pre>
 VIEW
 → 데이터베이스에 저장해 여러 SQL에서 재사용하는 객체</code></pre>
 <hr />
-<h2 id="41-cte">4.1 CTE</h2>
+<h2 id="cte">CTE</h2>
 <p>CTE는 Common Table Expression의 약자다.</p>
 <p><code>WITH</code> 절을 사용해 쿼리의 중간 결과에 이름을 지정한다.</p>
 <pre><code class="language-sql">WITH department_summary AS (
@@ -815,7 +818,7 @@ ORDER BY depth, employee_id;</code></pre>
 <li>상위·하위 항목 탐색</li>
 </ul>
 <hr />
-<h2 id="42-view">4.2 VIEW</h2>
+<h2 id="view">VIEW</h2>
 <p>VIEW는 <code>SELECT</code> 쿼리에 이름을 붙여 데이터베이스 객체로 저장한 것이다.</p>
 <pre><code class="language-sql">CREATE VIEW employee_department_view AS
 SELECT
@@ -931,7 +934,7 @@ GROUP BY department_id;</code></pre>
 <p>복잡한 쿼리 하나를 이해하기 쉽게 나누려면 CTE가 적합하다.</p>
 <p>여러 곳에서 동일한 조회 로직을 반복 사용한다면 VIEW가 적합하다.</p>
 <hr />
-<h1 id="5-윈도우-함수">5. 윈도우 함수</h1>
+<h1 id="윈도우-함수">윈도우 함수</h1>
 <p>집계 함수와 <code>GROUP BY</code>를 사용하면 여러 행이 하나의 그룹 결과로 축약된다.</p>
 <pre><code class="language-sql">SELECT
     department_id,
@@ -996,7 +999,7 @@ Window Function
          AND CURRENT ROW</code></pre>
 <p>파티션의 첫 번째 행부터 현재 행까지를 계산 범위로 사용한다.</p>
 <hr />
-<h2 id="51-순위-함수">5.1 순위 함수</h2>
+<h2 id="순위-함수">순위 함수</h2>
 <p>대표적인 순위 함수는 다음과 같다.</p>
 <ul>
 <li><code>ROW_NUMBER()</code></li>
@@ -1070,7 +1073,7 @@ FROM employees;</code></pre>
 </tr>
 </tbody></table>
 <hr />
-<h2 id="부서별-급여-상위-3명-조회">부서별 급여 상위 3명 조회</h2>
+<h3 id="예시-부서별-급여-상위-3명-조회">[예시] 부서별 급여 상위 3명 조회</h3>
 <p>윈도우 함수의 결과를 조건으로 필터링하려면 서브쿼리나 CTE를 사용할 수 있다.</p>
 <pre><code class="language-sql">WITH ranked_employees AS (
     SELECT
@@ -1093,7 +1096,7 @@ FROM ranked_employees
 WHERE salary_rank &lt;= 3;</code></pre>
 <p>이 쿼리는 부서별 급여 상위 3명을 조회한다.</p>
 <hr />
-<h2 id="52-lag와-lead">5.2 LAG와 LEAD</h2>
+<h2 id="lag와-lead">LAG와 LEAD</h2>
 <p><code>LAG()</code>는 현재 행을 기준으로 이전 행의 값을 가져온다.</p>
 <pre><code class="language-sql">SELECT
     employee_id,
@@ -1130,7 +1133,7 @@ FROM employees;</code></pre>
 <li>이전 순위와 현재 순위 비교</li>
 </ul>
 <hr />
-<h2 id="53-누적-합계">5.3 누적 합계</h2>
+<h2 id="누적-합계">누적 합계</h2>
 <p>집계 함수도 <code>OVER</code>와 함께 사용하면 윈도우 함수가 된다.</p>
 <pre><code class="language-sql">SELECT
     employee_id,
@@ -1155,7 +1158,7 @@ FROM employees;</code></pre>
 )</code></pre>
 <p>다만 계산 범위를 명확하게 표현하고 싶다면 Window Frame을 직접 작성하는 것이 좋다.</p>
 <hr />
-<h2 id="54-이동-평균">5.4 이동 평균</h2>
+<h2 id="이동-평균">이동 평균</h2>
 <p>현재 행과 주변 행을 범위로 지정하면 이동 평균을 계산할 수 있다.</p>
 <pre><code class="language-sql">SELECT
     employee_id,
@@ -1170,7 +1173,7 @@ FROM employees;</code></pre>
 <p>현재 행과 이전 두 행, 총 세 행의 평균을 계산한다.</p>
 <p>이동 평균은 데이터의 단기적인 변화보다 전체적인 흐름을 확인할 때 유용하다.</p>
 <hr />
-<h2 id="55-first_value와-last_value">5.5 FIRST_VALUE와 LAST_VALUE</h2>
+<h2 id="first_value와-last_value">FIRST_VALUE와 LAST_VALUE</h2>
 <p><code>FIRST_VALUE()</code>는 윈도우 범위의 첫 번째 값을 가져온다.</p>
 <pre><code class="language-sql">SELECT
     employee_id,
@@ -1183,7 +1186,7 @@ FROM employees;</code></pre>
 FROM employees;</code></pre>
 <p>부서별 최고 급여를 각 직원 행에 표시한다.</p>
 <hr />
-<h2 id="last_value의-window-frame-주의점">LAST_VALUE의 Window Frame 주의점</h2>
+<h3 id="last_value의-window-frame-주의점">LAST_VALUE의 Window Frame 주의점</h3>
 <p>다음처럼 작성하면 <code>LAST_VALUE()</code>가 예상과 다르게 현재 행의 값을 반환할 수 있다.</p>
 <pre><code class="language-sql">LAST_VALUE(salary) OVER (
     PARTITION BY department_id
@@ -1199,7 +1202,7 @@ FROM employees;</code></pre>
 )</code></pre>
 <p>윈도우 함수를 사용할 때는 함수 이름뿐 아니라 계산 범위가 어디까지인지도 함께 확인해야 한다.</p>
 <hr />
-<h1 id="전체-개념-요약">전체 개념 요약</h1>
+<h1 id="요약">요약</h1>
 <p>이번에 학습한 기능들은 모두 데이터를 조회하고 가공하기 위해 사용하지만 해결하는 문제가 다르다.</p>
 <table>
 <thead>
